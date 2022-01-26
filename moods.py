@@ -2,15 +2,16 @@ import spotipy
 import spotipy.util as util
 import json
 import requests
+import numpy as np
 
 # lifx credentials 
-token2 = "lifx token"
+lifx_token = "lifx token"
 headers = {
-    "Authorization": "Bearer %s" % token2,
+    "Authorization": "Bearer %s" % lifx_token,
 }
 
 # spotify credentials
-username='spotify username'
+username ='spotify username'
 scope = 'choose a scope'
 
 # open link to get user access
@@ -22,46 +23,37 @@ spotify = spotipy.Spotify(auth=token)
 # access the current track and find its ID
 current_track = spotify.current_user_playing_track()
 track = current_track['item']
-tId = track['id']
+track_id = track['id']
 
 # use track ID to find track features and add values to a list 
-track_details = spotify.audio_features(tId)
+track_details = spotify.audio_features(track_id)
 track_details_dict = track_details[0]
-check_list = [track_details_dict['danceability'], 
+value_list = [ 
     track_details_dict['energy'], 
     track_details_dict['speechiness'], 
-    track_details_dict['acousticness'], 
-    track_details_dict['instrumentalness'], 
-    track_details_dict['liveness']]
+    track_details_dict['instrumentalness']]
 
-# find maximum value in list, map index to track features
-max = 0
-for i in check_list:
-    if i > max:
-        max = i
-value = check_list.index(max)
+# convert track values into rgb values
+try: 
+    r = str(int(np.floor(256 * value_list[0])))
+    g = str(int(np.floor(256 * value_list[1])))
+    b = str(int(np.floor(256 * value_list[2])))
+    rgb = "rgb:"+r+","+g+","+b
+    print(rgb)
+# print error message when list is empty 
+except:
+    print('something went wrong, track values are most likeley not being received from spotify API')
 
-if value == 0:
-    colour = "red"
-elif value == 1:
-    colour = "blue"
-elif value == 2:
-    colour = "green"
-elif value ==3:
-    colour = "yellow"
-elif value == 4:
-    colour = "white"
-elif value == 5:
-    colour ="pink"
-else:
-    print('something went wrong')
+# add rgb value to payload
+# payload = {
+  #   "power": "on",
+   #  "color" : rgb
+# }
 
-payload = {
-        "color": colour,
-        "power": "on"
-    }
+# request to smartlamp 
+# response = requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
+  #                   data=json.dumps(payload), headers=headers)
 
-response =requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
-                    data=json.dumps(payload), headers=headers)
-            
-print(response.text)
+# print response from smartlamp   
+# print(response.text)
+
