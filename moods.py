@@ -33,20 +33,23 @@ value_list = [
     track_details_dict['speechiness'], 
     track_details_dict['instrumentalness']]
 
-try:
-# convert track values into rgb values 
+# convert track values into rgb values
+try: 
     r = str(int(np.floor(256 * value_list[0])))
     g = str(int(np.floor(256 * value_list[1])))
     b = str(int(np.floor(256 * value_list[2])))
     rgb = "rgb:"+r+","+g+","+b
 
+# print error message when list is empty 
 except:
     print('something went wrong, track values are most likeley not being received from spotify API')
+
 # add rgb value to payload
 payload = {
     "power": "on",
     "color" : rgb
 }
+
 # request to smartlamp 
 response = requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
                     data=json.dumps(payload), headers=headers)
