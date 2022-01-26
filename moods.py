@@ -28,45 +28,29 @@ track_id = track['id']
 # use track ID to find track features and add values to a list 
 track_details = spotify.audio_features(track_id)
 track_details_dict = track_details[0]
-value_list = [track_details_dict['danceability'], 
+value_list = [ 
     track_details_dict['energy'], 
     track_details_dict['speechiness'], 
-    track_details_dict['acousticness'], 
-    track_details_dict['instrumentalness'], 
-    track_details_dict['liveness']]
+    track_details_dict['instrumentalness']]
 
-# find maximum value in list, map index to track features
-check_array = np.asarray(value_list)
-max_value = np.argmax(check_array)
+try:
+# convert track values into rgb values 
+    r = str(int(np.floor(256 * value_list[0])))
+    g = str(int(np.floor(256 * value_list[1])))
+    b = str(int(np.floor(256 * value_list[2])))
+    rgb = "rgb:"+r+","+g+","+b
 
-try: 
-    # choose colour based on value from list 
-    match max_value:
-        case 0:
-            colour = "red"
-        case 1:
-            colour = "blue"
-        case 2:
-            colour = "green"
-        case 3:
-            colour = "yellow"
-        case 4:
-            colour = "pink"
-        case 5:
-            colour = "purple"
-    
 except:
-    print('something went wrong')
-
-# add colour to payoad of request to smartlamp
+    print('something went wrong, track values are most likeley not being received from spotify API')
+# add rgb value to payload
 payload = {
-        "color": colour,
-        "power": "on"
-    }
-
+    "power": "on",
+    "color" : rgb
+}
 # request to smartlamp 
-response =requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
+response = requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
                     data=json.dumps(payload), headers=headers)
 
 # print response from smartlamp   
 print(response.text)
+
