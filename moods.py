@@ -39,21 +39,21 @@ try:
     g = str(int(np.floor(256 * value_list[1])))
     b = str(int(np.floor(256 * value_list[2])))
     rgb = "rgb:"+r+","+g+","+b
-
+    print(rgb)
 # print error message when list is empty 
 except:
     print('something went wrong, track values are most likeley not being received from spotify API')
 
 # add rgb value to payload
-payload = {
-    "power": "on",
-    "color" : rgb
-}
+# payload = {
+  #   "power": "on",
+   #  "color" : rgb
+# }
 
 # request to smartlamp 
-response = requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
-                    data=json.dumps(payload), headers=headers)
+# response = requests.put('https://api.lifx.com/v1/lights/d073d562fa17/state',
+  #                   data=json.dumps(payload), headers=headers)
 
 # print response from smartlamp   
-print(response.text)
+# print(response.text)
 
